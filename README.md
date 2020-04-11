@@ -5,3 +5,9 @@
 * 키워드 검색
 * 찜하기 
 * 마이페이지(쇼핑몰, 찜한 상품 불러오기)
+
+
+## Use
+* HTML, CSS, Bootstrap
+* Javascript, jQuery, Ajax
+* Python, Beautifulsoup4, mongoDB, Flask

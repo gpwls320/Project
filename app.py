@@ -35,14 +35,8 @@ class MongoSessinoInterface(SessionInterface):
 
     def save_session(self, app, session, response):
         domain = self.get_cookie_domain(app)
-        if not session:
-            self.store.update({'sid': session.sid}, {
-                        'sid': session.sid,
-                        'data': session,
-                        'expiration': datetime.utcnow() +  timedelta(days=30)
-                    }, True) 
-            # BUG: 수정해 주세요.
-            #  response.delete_cookie(app.session_cookie_name, domain=domain)
+        if session is None:
+            response.delete_cookie(app.session_cookie_name, domain=domain)
             return
         if  self.get_expiration_time(app, session):
             expiration = self.get_expiration_time(app, session)

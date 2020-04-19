@@ -12,10 +12,9 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
     <script>
-        $('#nav-musinsa-tab').click(function(e) {
-            alert('탔다')
-            musinsaSearch();
-        })
+        $('a[data-toggle="tab"]').click(function(e) {
+            alert('알럿');
+        });
 
         function search() {
             keyword = $("#keyword").val();

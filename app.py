@@ -78,14 +78,9 @@ db = client.myshopping
 
 @app.route('/search', methods=['POST'])
 def search():
- 
-    keywordUrl = request.form['keywordUrl']
     url = request.form['url']
-    # musinsaUrl=request.form['musinsaUrl']
-
-    # URL을 읽어서 HTML를 받아오고,
     headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
-    data = requests.get(keywordUrl, headers=headers)
+    data = requests.get(url, headers=headers)
     # musinsa_data = request.get(musinsaUrl,headers=headers)
     
     # HTML을 BeautifulSoup이라는 라이브러리를 활용해 검색하기 용이한 상태로 만듦
@@ -114,6 +109,35 @@ def search():
     return jsonify({'result': 'success', 'data':products})
 
 
+@app.route('/musinsaSearch')
+def musinsaSearch():
+    url = request.form['url']
+    headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
+    data = requests.get(url, headers=headers)
+    soup = BeautifulSoup(data.text, 'html.parser')
+
+    # select를 이용해서, tr들을 불러오기
+    items = soup.select('#searchList>li>div')
+
+    products = []
+    # items (li들) 의 반복문을 돌리기
+    for item in items:
+        brdName= item.select_one('div>p.item_title>a').text
+        prdName = item.select_one('div>p.list_info>a').text
+        prdPrice = item.select_one('div>p.price').text
+        imgUrl=item.select_one('div>a>img')['src']
+        prdUrl=item.select_one('div>a')['href']
+        data={
+            'brdName':brdName,
+            'prdName': prdName,
+            'prdPrice': prdPrice,
+            'imgUrl': imgUrl,
+            'prdUrl':url+prdUrl
+        }
+        products.append(data)
+    
+    return jsonify({'result': 'success', 'data':products})
+
 
 @app.route('/like', methods=['POST'])
 def like():
@@ -132,22 +156,18 @@ def like():
 @app.route('/likeList')
 def likeList():
     session_id = session.sid
-    likePrd_url = list(db.prdlike.find({'session_id':session_id}, {'_id':False}))
+    likePrd_url = list(db.prdlike.find({'session_id':session_id}, {'_id':False, 'session_id':False}))
 
     if likePrd_url is not None:
 
         products = []
-        # items (li들) 의 반복문을 돌리기
         for url in likePrd_url:
-            # URL을 읽어서 HTML를 받아오고,
             headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
             data = requests.get(url, headers=headers)
             # musinsa_data = request.get(musinsaUrl,headers=headers)
             
-            # HTML을 BeautifulSoup이라는 라이브러리를 활용해 검색하기 용이한 상태로 만듦
             soup = BeautifulSoup(data.text, 'html.parser')
 
-            # select를 이용해서, tr들을 불러오기
             url = soup.select('#frmproduct>div')
 
             brdName= url.select_one('h2').text
@@ -169,7 +189,7 @@ def likeList():
 
 @app.route('/')
 def home():
-    resp = make_response(render_template('index.html'))
+    resp = make_response(render_template('list.html'))
     resp.set_cookie(app.session_cookie_name, session.sid)
     return resp
 

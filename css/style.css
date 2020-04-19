@@ -1,0 +1,56 @@
+.pr {
+    padding-right: 30px;
+}
+
+.mt {
+    margin-top: 30px;
+}
+
+.mb {
+    margin-bottom: 30px;
+}
+
+.pr {
+    padding-right: 30px;
+}
+
+.mt {
+    margin-top: 30px;
+}
+
+.mb {
+    margin-bottom: 30px;
+}
+
+* {
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.wrap {
+    width: 1000px;
+    margin: auto;
+}
+
+.comment {
+    color: blue;
+    font-weight: bold;
+}
+
+#prdList {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+#prdList>div {
+    margin: 14px;
+}
+
+.card-title {
+    height: 70px;
+}
+
+.card-title>p {
+    margin-bottom: .120rem;
+}

@@ -16,6 +16,11 @@
             alert('알럿');
         });
 
+        // $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+        //     e.target // newly activated tab
+        //     e.relatedTarget // previous active tab
+        // })
+
         function search() {
             keyword = $("#keyword").val();
             url = 'https://www.wconcept.co.kr/Search?kwd=' + keyword

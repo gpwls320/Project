@@ -63,24 +63,12 @@ client = MongoClient('localhost', 27017)
 db = client.myshopping
 
 
-# @app.route('/session_in')
-# def session_signin():
-#     print(session.sid)
-#     session['test'] = 'abc'
-#     return 'Login'
-
-
-# @app.route('/session_out')
-# def session_signout():
-#     session.clear()
-#     return "Signout"
-
-
 @app.route('/search', methods=['POST'])
 def search():
+    keywordUrl = request.form['keywordUrl']
     url = request.form['url']
     headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
-    data = requests.get(url, headers=headers)
+    data = requests.get(keywordUrl, headers=headers)
     # musinsa_data = request.get(musinsaUrl,headers=headers)
     
     # HTML을 BeautifulSoup이라는 라이브러리를 활용해 검색하기 용이한 상태로 만듦
@@ -109,7 +97,7 @@ def search():
     return jsonify({'result': 'success', 'data':products})
 
 
-@app.route('/musinsaSearch')
+@app.route('/musinsaSearch', methods=['POST'])
 def musinsaSearch():
     url = request.form['url']
     headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
@@ -117,16 +105,16 @@ def musinsaSearch():
     soup = BeautifulSoup(data.text, 'html.parser')
 
     # select를 이용해서, tr들을 불러오기
-    items = soup.select('#searchList>li>div')
+    items = soup.select('#searchList>li>div>div')
 
     products = []
     # items (li들) 의 반복문을 돌리기
     for item in items:
-        brdName= item.select_one('div>p.item_title>a').text
-        prdName = item.select_one('div>p.list_info>a').text
-        prdPrice = item.select_one('div>p.price').text
-        imgUrl=item.select_one('div>a>img')['src']
-        prdUrl=item.select_one('div>a')['href']
+        brdName= item.select_one('p.item_title>a')
+        prdName = item.select_one('p.list_info>a')
+        prdPrice = item.select_one('p.price')
+        imgUrl=item.select_one('a>img')['src']
+        prdUrl=item.select_one('a')['href']
         data={
             'brdName':brdName,
             'prdName': prdName,
@@ -163,16 +151,17 @@ def likeList():
         products = []
         for url in likePrd_url:
             headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
-            data = requests.get(url, headers=headers)
+            data = requests.get(url['prd_url'], headers=headers)
             # musinsa_data = request.get(musinsaUrl,headers=headers)
             
             soup = BeautifulSoup(data.text, 'html.parser')
 
-            url = soup.select('#frmproduct>div')
+            prd_info = soup.select('#frmproduct')
 
-            brdName= url.select_one('h2').text
-            prdName = url.select_one('h3').text
-            prdPrice = url.select_one('dl>dd>>em').text
+            brdName= prd_info.select('div.h_group>h2.brand>a').text
+            prdName = prd_info.select_one('h3').text
+            prdPrice=prd_info.select_one('').text
+            likePrd_url = soup.select('#img_01')['src']
 
             data={
                 'brdName':brdName,

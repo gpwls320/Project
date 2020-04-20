@@ -21,14 +21,41 @@
         //     e.relatedTarget // previous active tab
         // })
 
+        $(document).ready(function() {
+
+            $('#nav-tab a').click(function(e) {
+                e.preventDefault();
+                musinsaSearch();
+            });
+        });
+
+        function prd_like(prdUrl) {
+            $.ajax({
+                type: "POST",
+                url: "/like",
+                data: {
+                    'prd_url': prdUrl
+                },
+                success: function(response) {
+                    if (response['result'] == 'success') {
+                        // 2. '좋아요 완료!' 얼럿을 띄웁니다.
+                        alert('찜하기 완료!')
+                        $('#likeBtn').hide();
+                        $('#unLikeBtn').show();
+                    }
+                }
+            });
+        }
+
         function search() {
             keyword = $("#keyword").val();
-            url = 'https://www.wconcept.co.kr/Search?kwd=' + keyword
-
+            keywordUrl = 'https://www.wconcept.co.kr/Search?kwd=' + keyword + '&sort=1'
+            url = 'https://www.wconcept.co.kr'
             $.ajax({
                 type: "POST",
                 url: "/search",
                 data: {
+                    'keywordUrl': keywordUrl,
                     'url': url
                 },
                 success: function(response) { // 성공하면

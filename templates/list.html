@@ -1,213 +1,23 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-    <title>쇼핑 큐레이션</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!--CND BOOTSTRAP -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <!--JQUERY-->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-
-    <script>
-        $('a[data-toggle="tab"]').click(function(e) {
-            alert('알럿');
-        });
-
-        // $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-        //     e.target // newly activated tab
-        //     e.relatedTarget // previous active tab
-        // })
-
-        $(document).ready(function() {
-
-            $('#nav-tab a').click(function(e) {
-                e.preventDefault();
-                musinsaSearch();
-            });
-        });
-
-        function prd_like(prdUrl) {
-            $.ajax({
-                type: "POST",
-                url: "/like",
-                data: {
-                    'prd_url': prdUrl
-                },
-                success: function(response) {
-                    if (response['result'] == 'success') {
-                        // 2. '좋아요 완료!' 얼럿을 띄웁니다.
-                        alert('찜하기 완료!')
-                        $('#likeBtn').hide();
-                        $('#unLikeBtn').show();
-                    }
-                }
-            });
-        }
-
-        function search() {
-            keyword = $("#keyword").val();
-            keywordUrl = 'https://www.wconcept.co.kr/Search?kwd=' + keyword + '&sort=1'
-            url = 'https://www.wconcept.co.kr'
-            $.ajax({
-                type: "POST",
-                url: "/search",
-                data: {
-                    'keywordUrl': keywordUrl,
-                    'url': url
-                },
-                success: function(response) { // 성공하면
-                    if (response['result'] == 'success') {
-                        for (let i = 0; i < response['data'].length; i++) {
-                            const prdList = response['data'][i];
-                            make_card(prdList)
-                        }
-                    }
-                }
-            })
-        }
-
-        function musinsaSearch() {
-            keyword = $("#keyword").val();
-
-            url = 'https://search.musinsa.com/search/wusinsa/?q=' + keyword
-            $.ajax({
-                type: "POST",
-                url: "/musinsaSearch",
-                data: {
-                    'url': url
-                },
-                success: function(response) { // 성공하면
-                    if (response['result'] == 'success') {
-                        for (let i = 0; i < response['data'].length; i++) {
-                            const prdList = response['data'][i];
-                            musinsa_make_card(prdList)
-                        }
-                    }
-                }
-            })
-        }
-
-        function make_card(prdList) {
-            let temp_html = `<div class="card" style="width: 14rem;">
-                    <img src="${prdList.imgUrl}" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <div class="card-title">
-                            <h5>${prdList.brdName}</h5>
-                            <p style="font-weight:300;">${prdList.prdName}</p>
-                        </div>
-                        <p class="card-text"> ${prdList.prdPrice} 원</p>
-                        <a href="${prdList.prdUrl}" class="btn btn-primary" role="button" target="_blank">구매하기</a> 
-                        <a href="#" class="btn btn-default" role="button" id="likeBtn"onclick="prd_like('${prdList.prdUrl}')">찜하기</a>
-                        <a href="#" class="btn btn-default" role="button" id="unLikeBtn"onclick="prd_like('${prdList.prdUrl}')" style="display:none">찜해제</a>
-                    </div>
-                </div>`;
-
-            $('#wconcept-wrap').append(temp_html);
-        }
-
-        function musinsa_make_card(prdList) {
-            let temp_html = `<div class="card" style="width: 14rem;">
-                    <img src="${prdList.imgUrl}" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <div class="card-title">
-                            <h5>${prdList.brdName}</h5>
-                            <p style="font-weight:300;">${prdList.prdName}</p>
-                        </div>
-                        <p class="card-text"> ${prdList.prdPrice} 원</p>
-                        <a href="${prdList.prdUrl}" class="btn btn-primary" role="button" target="_blank">구매하기</a> 
-                        <a href="#" class="btn btn-default" role="button" id="likeBtn"onclick="prd_like('${prdList.prdUrl}')">찜하기</a>
-                        <a href="#" class="btn btn-default" role="button" id="unLikeBtn"onclick="prd_like('${prdList.prdUrl}')" style="display:none">찜해제</a>
-                    </div>
-                </div>`;
-
-            $('#musinsa-wrap').append(temp_html);
-        }
-    </script>
-
-    <style>
-        * {
-            font-family: 'Noto Sans KR', sans-serif;
-        }
-        
-        .container {
-            margin: auto;
-            width: 1200px;
-            margin-top: 30px;
-        }
-        
-        .comment {
-            color: blue;
-            font-weight: bold;
-        }
-        
-        #wconcept-wrap {
-            margin: auto;
-            display: flex;
-            flex-flow: row wrap;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        #wconcept-wrap>div {
-            margin: 13px;
-        }
-        
-        .card-title {
-            height: 70px;
-        }
-        
-        .card-title>p {
-            margin-bottom: .120rem;
-        }
-    </style>
-</head>
-
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="/">쇼핑 큐레이션</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item ">
-                    <a class="nav-link " href="/mypage ">마이페이지</a>
-                </li>
-            </ul>
-            <form class="form-inline my-2 my-lg-0 ">
-                <input class="form-control mr-sm-2 " type="search " placeholder="Search " aria-label="Search" id="keyword">
-                <button type="button" class="btn btn-outline-success" onclick="search()">Search</button>
-            </form>
+{% extends "layout.html" %} {% block title %} 검색페이지 {% endblock %} {% block content %}
+<div class="container">
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a class="nav-item nav-link active" id="nav-wconcept-tab" data-toggle="tab" href="#nav-wconcept" role="tab" aria-controls="nav-home" aria-selected="true">W컨셉</a>
+            <a class="nav-item nav-link" id="nav-musinsa-tab" data-toggle="tab" href="#nav-musinsa" role="tab" aria-controls="nav-profile" aria-selected="false">무신사</a>
         </div>
     </nav>
+    <div class="tab-content" id="nav-tabContent">
+        <div class="tab-pane fade show active" id="nav-wconcept" role="tabpanel" aria-labelledby="nav-home-tab">
+            <div id="wconcept-wrap">
 
-    <div class="container">
-        <nav>
-            <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                <a class="nav-item nav-link active" id="nav-wconcept-tab" data-toggle="tab" href="#nav-wconcept" role="tab" aria-controls="nav-home" aria-selected="true">W컨셉</a>
-                <a class="nav-item nav-link" id="nav-musinsa-tab" data-toggle="tab" href="#nav-musinsa" role="tab" aria-controls="nav-profile" aria-selected="false">무신사</a>
-                <a class="nav-item nav-link" id="nav-styleShare-tab" data-toggle="tab" href="#nav-styleShare" role="tab" aria-controls="nav-contact" aria-selected="false">스타일쉐어</a>
             </div>
-        </nav>
-        <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="nav-wconcept" role="tabpanel" aria-labelledby="nav-home-tab">
-                <div id="wconcept-wrap">
-
-                </div>
-            </div>
-            <div class="tab-pane fade" id="nav-musinsa" role="tabpanel" aria-labelledby="nav-profile-tab">
-                <div id="musinsa-wrap">
-
-                </div>
-            </div>
-            <div class="tab-pane fade" id="nav-styleShare" role="tabpanel" aria-labelledby="nav-contact-tab">...</div>
         </div>
+        <div class="tab-pane fade" id="nav-musinsa" role="tabpanel" aria-labelledby="nav-profile-tab">
+            <div id="musinsa-wrap">
 
+            </div>
+        </div>
     </div>
-</body>
 
-</html>
+</div>
+{% endblock %}

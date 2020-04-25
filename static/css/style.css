@@ -1,0 +1,46 @@
+* {
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.container {
+    margin: auto;
+    width: 1200px;
+    margin-top: 30px;
+}
+
+.comment {
+    color: blue;
+    font-weight: bold;
+}
+
+#wconcept-wrap {
+    margin: auto;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+#musinsa-wrap {
+    margin: auto;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+#wconcept-wrap>div {
+    margin: 13px;
+}
+
+#musinsa-wrap>div {
+    margin: 13px;
+}
+
+.card-title {
+    height: 70px;
+}
+
+.card-title>p {
+    margin-bottom: .120rem;
+}

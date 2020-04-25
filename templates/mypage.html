@@ -1,109 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>쇼핑 큐레이션 - 마이페이지</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
-    <!-- JS -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-
-    <script>
-        $(document).ready(function() {
-            listing();
-        });
-
-        function listing() {
-            $.ajax({
-                type: "GET",
-                url: '/likeList',
-                data: {},
-                success: function(response) {
-                    if (reponse['result'] == 'success') {
-                        for (i = 0; i < response['data'].length; i++) {
-                            const likePrd = response['data'][i]
-                            make_card(likePrd)
-                        }
-                    }
-                }
-
-            })
-        }
-
-        function make_card(likePrd) {
-            let temp_html = `<div class="card" style="width: 18rem;" >
-                    <img src="${likePrd.imgUrl}" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <div class="card-title">
-                            <h5>${likePrd.brdName}</h5>
-                            <p style="font-weight:300;">${likePrd.prdName}</p>
-                        </div>
-                        <p class="card-text"> ${likePrd.prdPrice} 원</p>
-                        <a href="${likePrd.prdUrl}" class="btn btn-primary" role="button" target="_blank">구매하기</a> 
-                        <a href="#" class="btn btn-default" role="button" onclick="prd_unlike('${likePrd.prdUrl}')">찜해제</a>
-                    </div>
-                </div>`
-        }
-
-        function prd_unlike(prdUrl) {
-            $.ajax({
-                type: "POST",
-                url: '/unlike',
-                data: {
-                    "un_like": prdUrl
-                },
-                success: function(reponse) {
-
-                }
-            })
-        }
-    </script>
-
-    <style>
-        .wrap {
-            width: 1000px;
-            padding: 50px;
-            margin: auto;
-        }
-    </style>
-</head>
-
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">쇼핑 큐레이션</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">W컨셉</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">무신사</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">스타일쉐어</a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="/mypage">마이페이지 <span class="sr-only">(current)</span></a>
-                </li>
-            </ul>
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="keyword">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="button" onclick="search()">Search</button>
-            </form>
+{% extends "layout.html" %} {% block title %} 마이페이지 {% endblock %} {% block content %}
+<div class="container">
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a class="nav-item nav-link active" id="my-wconcept-tab" data-toggle="tab" href="#my-wconcept" role="tab" aria-controls="nav-home" aria-selected="true">W컨셉</a>
+            <a class="nav-item nav-link" id="my-musinsa-tab" data-toggle="tab" href="#my-musinsa" role="tab" aria-controls="nav-profile" aria-selected="false">무신사</a>
         </div>
     </nav>
-    <div class="wrap">
-
+    <div class="tab-content" id="nav-tabContent">
+        {% for value in products %} {% if value['siteName']=="wconcept"%}
+        <div class="tab-pane fade show active" id="my-wconcept" role="tabpanel" aria-labelledby="nav-home-tab">
+            <div id="wconcept-wrap">
+                <div class="card" style="width: 18rem;">
+                    <img src="{{ value['imgUrl'] }}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <div class="card-title">
+                            <h5>{{ value['brdName'] }}</h5>
+                            <p style="font-weight:300;">{{ value['prdName'] }}</p>
+                        </div>
+                        <p class="card-text">{{ value['prdPrice'] }} 원</p>
+                        <a href="{{ value['prdUrl'] }}" class="btn btn-primary" role="button" target="_blank">구매하기</a>
+                        <a href="#" class="btn btn-default" role="button" onclick='prd_unlike({{ value["prdUrl"] }})'>찜해제</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="tab-pane fade" id="my-musinsa" role="tabpanel" aria-labelledby="nav-profile-tab">
+            <div id="musinsa-wrap">
+                <div class="card" style="width: 18rem;">
+                    <img src="{{ value['imgUrl'] }}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <div class="card-title">
+                            <h5>{{ value['brdName'] }}</h5>
+                            <p style="font-weight:300;">{{ value['prdName'] }}</p>
+                        </div>
+                        <p class="card-text">{{ value['prdPrice'] }} 원</p>
+                        <a href="{{ value['prdUrl'] }}" class="btn btn-primary" role="button" target="_blank">구매하기</a>
+                        <a href="#" class="btn btn-default" role="button" onclick="prd_unlike()">찜해제</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif%} {% endfor %}
     </div>
-</body>
 
-</html>
+</div>
+{% endblock %}

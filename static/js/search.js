@@ -5,7 +5,11 @@ $(document).ready(function() {
     // });
 
     $('#nav-wconcept-tab').click(function() {
-        alert('a')
+        search()
+    })
+
+    $('#nav-musinsa-tab').click(function() {
+        musinsaSearch()
     })
 });
 

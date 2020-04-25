@@ -86,6 +86,7 @@ def search():
         imgUrl=item.select_one('a>div>img')['src']
         prdUrl=item.select_one('a')['href']
         data={
+            'siteName':'wconcept',
             'brdName':brdName,
             'prdName': prdName,
             'prdPrice': prdPrice,
@@ -105,22 +106,23 @@ def musinsaSearch():
     soup = BeautifulSoup(data.text, 'html.parser')
 
     # select를 이용해서, tr들을 불러오기
-    items = soup.select('#searchList>li>div>div')
+    items = soup.select('#searchList>li')
 
     products = []
     # items (li들) 의 반복문을 돌리기
     for item in items:
-        brdName= item.select_one('p.item_title>a')
-        prdName = item.select_one('p.list_info>a')
-        prdPrice = item.select_one('p.price')
-        imgUrl=item.select_one('a>img')['src']
-        prdUrl=item.select_one('a')['href']
+        brdName= item.select_one('div>div>p.item_title>a').text
+        prdName = item.select_one('div>div>p.list_info>a')['title']
+        prdPrice = item.select_one('div>div>p.price').text
+        imgUrl=item.select_one('div>div>a>img')['data-original']
+        prdUrl=item.select_one('div>div>a.img-block')['href']
         data={
+            'siteName':'musinsa',
             'brdName':brdName,
             'prdName': prdName,
             'prdPrice': prdPrice,
             'imgUrl': imgUrl,
-            'prdUrl':url+prdUrl
+            'prdUrl':prdUrl
         }
         products.append(data)
     
@@ -129,16 +131,26 @@ def musinsaSearch():
 
 @app.route('/like', methods=['POST'])
 def like():
-    
     session_id = session.sid
+    site_name=request.form['site_name']
     prd_url = request.form['prd_url']
 
     db.prdlike.insert_one({
+        'site_name':site_name,
         'prd_url':prd_url,
         'session_id':session_id
     })
 
     return jsonify({'result': 'success', 'msg': '찜 완료!'})
+
+
+@app.route('/unlike', methods=['POST'])
+def unlike():
+    session_id = session.sid
+    prd_url = request.form['prd_url']
+    db.prdlike.delete_one({session_id: session_id ,prd_url:'prd_url'})
+
+    return jsonify({'result':'success'})
 
 
 @app.route('/likeList')
@@ -152,25 +164,42 @@ def likeList():
         for url in likePrd_url:
             headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
             data = requests.get(url['prd_url'], headers=headers)
-            # musinsa_data = request.get(musinsaUrl,headers=headers)
             
             soup = BeautifulSoup(data.text, 'html.parser')
+            site_name=url['site_name']
+            if site_name == "wconcept":
+                brdName = soup.select('.h_group > .brand')[0].text
+                prdName = soup.select('.h_group > .product')[0].text
+                prdPrice = soup.select('.price_wrap  .sale  em')[0].text
+                likePrd_url = soup.select('#img_01')[0]['src']
 
-            prd_info = soup.select('#frmproduct')
+                data={
+                    'siteName':site_name,
+                    'brdName':brdName,
+                    'prdName': prdName,
+                    'prdPrice': prdPrice,
+                    'imgUrl':likePrd_url,
+                    'prdUrl':url['prd_url']
+                }
+                
+                products.append(data)
+            else:
+                brdName = soup.select('.product_article_contents>strong')[0].text
+                prdName = soup.select('.product_title>span')[1].text
+                prdPrice = soup.select('#sale_price')[0].text
+                imgUrl = soup.select('#bigimg')[0]['src']
 
-            brdName= prd_info.select('div.h_group>h2.brand>a').text
-            prdName = prd_info.select_one('h3').text
-            prdPrice=prd_info.select_one('').text
-            likePrd_url = soup.select('#img_01')['src']
+                data={
+                    'siteName':site_name,
+                    'brdName':brdName,
+                    'prdName': prdName,
+                    'prdPrice': prdPrice,
+                    'imgUrl':imgUrl,
+                    'prdUrl':url['prd_url']
+                }
+                
+                products.append(data)
 
-            data={
-                'brdName':brdName,
-                'prdName': prdName,
-                'prdPrice': prdPrice,
-                'prdUrl':likePrd_url
-            }
-            
-            products.append(data)
         print(products)
 
     return jsonify({'result': 'success', 'data':products})
@@ -182,9 +211,56 @@ def home():
     resp.set_cookie(app.session_cookie_name, session.sid)
     return resp
 
+
 @app.route('/mypage')
 def mypage():
-    return render_template('mypage.html')
+    session_id = session.sid
+    likePrd_url = list(db.prdlike.find({'session_id':session_id}, {'_id':False, 'session_id':False}))
+
+    if likePrd_url is not None:
+
+        products = []
+        for url in likePrd_url:
+            headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
+            data = requests.get(url['prd_url'], headers=headers)
+            
+            soup = BeautifulSoup(data.text, 'html.parser')
+            site_name=url['site_name']
+            if site_name == "wconcept":
+                brdName = soup.select('.h_group > .brand')[0].text
+                prdName = soup.select('.h_group > .product')[0].text
+                prdPrice = soup.select('.price_wrap  .sale  em')[0].text
+                likePrd_url = soup.select('#img_01')[0]['src']
+
+                data={
+                    'siteName':site_name,
+                    'brdName':brdName,
+                    'prdName': prdName,
+                    'prdPrice': prdPrice,
+                    'imgUrl':likePrd_url,
+                    'prdUrl':url['prd_url']
+                }
+                
+                products.append(data)
+            else:
+                brdName = soup.select('.product_article_contents>strong')[0].text
+                prdName = soup.select('.product_title>span')[0].text
+                prdPrice = soup.select('#goods_price')[0].text
+                imgUrl = soup.select('#bigimg')[0]['src']
+
+                data={
+                    'siteName':site_name,
+                    'brdName':brdName,
+                    'prdName': prdName,
+                    'prdPrice': prdPrice,
+                    'imgUrl':imgUrl,
+                    'prdUrl':url['prd_url']
+                }
+                
+                products.append(data)
+
+        print(products)
+    return render_template('mypage.html', products = products)
 
 
 if __name__=="__main__":

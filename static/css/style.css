@@ -13,6 +13,11 @@
     font-weight: bold;
 }
 
+.style_story {
+    margin-top: 60px;
+    text-align: center;
+}
+
 #wconcept-wrap {
     margin: auto;
     display: flex;
@@ -38,9 +43,13 @@
 }
 
 .card-title {
-    height: 70px;
+    height: 100px;
 }
 
 .card-title>p {
     margin-bottom: .120rem;
+}
+
+#searchBtn {
+    margin-right: 5px;
 }

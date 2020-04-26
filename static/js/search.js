@@ -4,12 +4,25 @@ $(document).ready(function() {
     //     e.preventDefault();
     // });
 
+    var param = document.location.href.split("?")[1];
+    if (param !== "undefined") {
+        temp = param.split("=")[1];
+        search(temp)
+    }
+
     $('#nav-wconcept-tab').click(function() {
         search()
     })
 
     $('#nav-musinsa-tab').click(function() {
-        musinsaSearch()
+        musinsaSearch(temp)
+    })
+
+    $("#wrap-loading").hide();
+    $(document).ajaxStart(function() {
+        $("#wrap-loading").show();
+    }).ajaxStop(function() {
+        $("#wrap-loading").hide();
     })
 });
 
@@ -22,23 +35,53 @@ function prd_like(siteName, prdUrl) {
             'prd_url': prdUrl
         },
         success: function(response) {
-            if (response['result'] == 'success') {
+            if (response['result'] == 'fail') {
                 // 2. '좋아요 완료!' 얼럿을 띄웁니다.
+                alert('이미 찜한 상품입니다.')
+            } else {
                 alert('찜하기 완료!')
             }
         }
     });
 }
 
-function search() {
-    keyword = $("#keyword").val();
-    if (keyword === '') {
+function prd_unlike(productId) {
+    $.ajax({
+        type: "POST",
+        url: '/unlike',
+        data: {
+            "product_id": productId
+        },
+        success: function(response) {
+            if (response['result'] == 'success') {
+                alert('찜 해제 완료!')
+                window.location.reload()
+            }
+        }
+    })
+}
+
+function searchList() {
+    const keyword = $("#keyword").val();
+    console.log(keyword)
+    location.href = "/list?q=" + encodeURI(keyword);
+}
+
+function enterkey() {
+    if (window.event.keyCode == 13) {
+        // 엔터키가 눌렸을 때 실행할 내용
+        search(temp);
+    }
+}
+
+function search(temp) {
+
+    if (temp === '') {
         alert('검색어를 입력하세요.')
         $("#keyword").focus();
         return false
     } else {
-        keyword = $("#keyword").val();
-        keywordUrl = 'https://www.wconcept.co.kr/Search?kwd=' + keyword + '&sort=1'
+        keywordUrl = 'https://www.wconcept.co.kr/Search?kwd=' + temp + '&sort=1'
         url = 'https://www.wconcept.co.kr'
         $.ajax({
             type: "POST",
@@ -57,17 +100,16 @@ function search() {
             }
         })
     }
-
 }
 
-function musinsaSearch() {
-    keyword = $("#keyword").val();
-    if (keyword === '') {
+
+function musinsaSearch(temp) {
+    if (temp === '') {
         alert('검색어를 입력하세요.')
         $("#keyword").focus();
         return false
     } else {
-        url = 'https://search.musinsa.com/search/wusinsa/?q=' + keyword
+        url = 'https://search.musinsa.com/search/wusinsa/?q=' + temp
         $.ajax({
             type: "POST",
             url: "/musinsaSearch",
@@ -88,7 +130,9 @@ function musinsaSearch() {
 
 function make_card(prdList) {
     let temp_html = `<div class="card" style="width: 14rem;">
-            <img src="${prdList.imgUrl}" class="card-img-top" alt="...">
+            <a href="${prdList.imgUrl}">
+                <img src="${prdList.imgUrl}" class="card-img-top" alt="...">
+            </a>
             <div class="card-body">
                 <div class="card-title">
                     <h5>${prdList.brdName}</h5>
@@ -107,20 +151,4 @@ function make_card(prdList) {
     } else if (site_name === "musinsa") {
         $('#musinsa-wrap').append(temp_html);
     }
-}
-
-function prd_unlike(prdUrl) {
-    alert(prdUrl)
-    $.ajax({
-        type: "POST",
-        url: '/unlike',
-        data: {
-            "prd_url": prdUrl
-        },
-        success: function(reponse) {
-            if (response['result'] == 'success') {
-                alert('찜 해제 완료!')
-            }
-        }
-    })
 }

@@ -1,48 +1,24 @@
 {% extends "layout.html" %} {% block title %} 마이페이지 {% endblock %} {% block content %}
-<div class="container">
-    <nav>
-        <div class="nav nav-tabs" id="nav-tab" role="tablist">
-            <a class="nav-item nav-link active" id="my-wconcept-tab" data-toggle="tab" href="#my-wconcept" role="tab" aria-controls="nav-home" aria-selected="true">W컨셉</a>
-            <a class="nav-item nav-link" id="my-musinsa-tab" data-toggle="tab" href="#my-musinsa" role="tab" aria-controls="nav-profile" aria-selected="false">무신사</a>
-        </div>
-    </nav>
-    <div class="tab-content" id="nav-tabContent">
-        {% for value in products %} {% if value['siteName']=="wconcept"%}
-        <div class="tab-pane fade show active" id="my-wconcept" role="tabpanel" aria-labelledby="nav-home-tab">
-            <div id="wconcept-wrap">
-                <div class="card" style="width: 18rem;">
-                    <img src="{{ value['imgUrl'] }}" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <div class="card-title">
-                            <h5>{{ value['brdName'] }}</h5>
-                            <p style="font-weight:300;">{{ value['prdName'] }}</p>
-                        </div>
-                        <p class="card-text">{{ value['prdPrice'] }} 원</p>
-                        <a href="{{ value['prdUrl'] }}" class="btn btn-primary" role="button" target="_blank">구매하기</a>
-                        <a href="#" class="btn btn-default" role="button" onclick='prd_unlike("{{value["product_id"]}}")'>찜해제</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% else %}
-        <div class="tab-pane fade" id="my-musinsa" role="tabpanel" aria-labelledby="nav-profile-tab">
-            <div id="musinsa-wrap">
-                <div class="card" style="width: 18rem;">
-                    <img src="{{ value['imgUrl'] }}" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <div class="card-title">
-                            <h5>{{ value['brdName'] }}</h5>
-                            <p style="font-weight:300;">{{ value['prdName'] }}</p>
-                        </div>
-                        <p class="card-text">{{ value['prdPrice'] }} 원</p>
-                        <a href="{{ value['prdUrl'] }}" class="btn btn-primary" role="button" target="_blank">구매하기</a>
-                        <a href="#" class="btn btn-default" role="button" onclick='prd_unlike("{{value["product_id"]}}")'>찜해제</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif%} {% endfor %}
-    </div>
 
+<div class="wrap">
+    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+        <h2 style="margin-left: 12px;">MY PAGE</h2>
+        <a class="nav-link active" id="nav-wconcept-tab" data-toggle="pill" href="#my-wconcept" role="tab" aria-controls="nav-wconcept" aria-selected="true">W concept</a>
+        <a class="nav-link" id="nav-musinsa-tab" data-toggle="pill" href="#my-musinsa" role="tab" aria-controls="nav-musinsa" aria-selected="false">무신사</a>
+    </div>
+    <div class="tab-content" id="v-pills-tabContent">
+        <div class="tab-pane fade show active" id="my-wconcept" role="tabpanel" aria-labelledby="nav-wconcept">
+            <div id="wconcept-wrap">
+
+            </div>
+        </div>
+        <div class="tab-pane fade" id="my-musinsa" role="tabpanel" aria-labelledby="nav-musinsa">
+            <div id="musinsa-wrap">
+
+            </div>
+        </div>
+    </div>
 </div>
+<script src="{{ url_for('static', filename='/js/mypage.js') }}"></script>
+
 {% endblock %}

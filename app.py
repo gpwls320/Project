@@ -158,102 +158,15 @@ def unlike():
     return jsonify({'result':'success'})
 
 
-# @app.route('/likeList')
-# def likeList():
-#     session_id = session.sid
-#     likePrd_url = list(db.prdlike.find({'session_id':session_id}, {'session_id':False}))
-
-#     if likePrd_url is not None:
-
-#         products = []
-#         for url in likePrd_url:
-#             headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
-#             data = requests.get(url['prd_url'], headers=headers)
-            
-#             soup = BeautifulSoup(data.text, 'html.parser')
-#             site_name=url['site_name']
-#             if site_name == "wconcept":
-#                 brdName = soup.select('.h_group > .brand')[0].text
-#                 prdName = soup.select('.h_group > .product')[0].text
-#                 prdPrice = soup.select('.price_wrap  .sale  em')[0].text
-#                 likePrd_url = soup.select('#img_01')[0]['src']
-
-#                 data={
-#                     'siteName':site_name,
-#                     'brdName':brdName,
-#                     'prdName': prdName,
-#                     'prdPrice': prdPrice,
-#                     'imgUrl':likePrd_url,
-#                     'prdUrl':url['prd_url']
-#                 }
-                
-#                 products.append(data)
-#             else:
-#                 brdName = soup.select('.product_article_contents>strong')[0].text
-#                 prdName = soup.select('.product_title>span')[1].text
-#                 prdPrice = soup.select('#sale_price')[0].text
-#                 imgUrl = soup.select('#bigimg')[0]['src']
-
-#                 data={
-#                     'siteName':site_name,
-#                     'brdName':brdName,
-#                     'prdName': prdName,
-#                     'prdPrice': prdPrice,
-#                     'imgUrl':imgUrl,
-#                     'prdUrl':url['prd_url']
-#                 }
-                
-#                 products.append(data)
-
-#         print(products)
-
-#     return jsonify({'result': 'success', 'data':products})
-
-
-@app.route('/')
-def home():
-
-    headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
-    data = requests.get('https://www.wconcept.co.kr/', headers=headers)
-    soup = BeautifulSoup(data.text, 'html.parser')
-
-    # select를 이용해서, tr들을 불러오기
-    new_products = soup.select('#whatsnew_list>li')
-
-    products = []
-    # items (li들) 의 반복문을 돌리기
-    for new_product in new_products:
-        prdUrl= new_product.select_one('a')['href']
-        imgUrl = new_product.select_one('a>div>img')['src']
-        brdName = new_product.select_one('a>div>div.text_wrap>div').text
-        prdName = new_product.select_one('a>div>div.text_wrap>div.product').text
-        prdPrice = new_product.select_one('a>div>div>span.discount_price').text
-        data={
-            'prdUrl':'https://www.wconcept.co.kr'+prdUrl,
-            'imgUrl':imgUrl,
-            'brdName': brdName,
-            'prdName':prdName,
-            'prdPrice':prdPrice
-        }
-        products.append(data)
-
-
-    resp = make_response(render_template('index.html', products=products))
-    resp.set_cookie(app.session_cookie_name, session.sid)
-    return resp
-
-
-@app.route('/list')
-def searchList():
-    
-    return render_template('list.html')
-
-
-@app.route('/mypage')
-def mypage():
+@app.route('/likeList')
+def likeList():
     session_id = session.sid
     likePrd_url = list(db.prdlike.find({'session_id':session_id}, {'session_id':False}))
+    wconcept_count = db.prdlike.count({'session_id':session_id, 'site_name':'wconcept'})
+    musinsa_count = db.prdlike.count({'session_id':session_id, 'site_name':'musinsa'})
 
+    count={'wconcept_count':wconcept_count, 'musinsa_count':musinsa_count}
+    
     if likePrd_url is not None:
 
         products = []
@@ -272,6 +185,7 @@ def mypage():
                 likePrd_url = soup.select('#img_01')[0]['src']
 
                 data={
+                    'count':wconcept_count,
                     'product_id':str(product_id),
                     'siteName':site_name,
                     'brdName':brdName,
@@ -301,8 +215,51 @@ def mypage():
                 products.append(data)
 
         print(products)
-    return render_template('mypage.html', products = products)
+    return jsonify({'result': 'success', 'data':products, 'count':count})
 
+
+@app.route('/')
+def home():
+
+    headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
+    data = requests.get('https://www.wconcept.co.kr/', headers=headers)
+    soup = BeautifulSoup(data.text, 'html.parser')
+
+    # select를 이용해서, tr들을 불러오기
+    new_products = soup.select('#whatsnew_list>li')
+
+    products = []
+    # items (li들) 의 반복문을 돌리기
+    for new_product in new_products:
+        prdUrl= new_product.select_one('a')['href']
+        imgUrl = new_product.select_one('a>div>img')['src']
+        brdName = new_product.select_one('a>div>div.text_wrap>div').text
+        prdName = new_product.select_one('a>div>div.text_wrap>div.product').text
+        prdPrice = new_product.select_one('a>div>div>span.discount_price').text
+        data={
+            'prdUrl':'https://www.wconcept.co.kr'+prdUrl,
+            'imgUrl':imgUrl,
+            'brdName': brdName,
+            'prdName':prdName,
+            'prdPrice':prdPrice
+        }
+        products.append(data)
+
+    resp = make_response(render_template('index.html', products=products))
+    resp.set_cookie(app.session_cookie_name, session.sid)
+    return resp
+
+
+@app.route('/list')
+def searchList():
+    
+    return render_template('list.html')
+
+
+@app.route('/mypage')
+def mypage():
+
+    return render_template('mypage.html')
 
 if __name__=="__main__":
-    app.run('localhost', 5001, debug=True)
+    app.run('localhost', port=80, debug=True)

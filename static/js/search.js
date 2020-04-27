@@ -10,19 +10,13 @@ $(document).ready(function() {
         search(temp)
     }
 
+
     $('#nav-wconcept-tab').click(function() {
-        search()
+        search(temp)
     })
 
     $('#nav-musinsa-tab').click(function() {
         musinsaSearch(temp)
-    })
-
-    $("#wrap-loading").hide();
-    $(document).ajaxStart(function() {
-        $("#wrap-loading").show();
-    }).ajaxStop(function() {
-        $("#wrap-loading").hide();
     })
 });
 
@@ -43,22 +37,6 @@ function prd_like(siteName, prdUrl) {
             }
         }
     });
-}
-
-function prd_unlike(productId) {
-    $.ajax({
-        type: "POST",
-        url: '/unlike',
-        data: {
-            "product_id": productId
-        },
-        success: function(response) {
-            if (response['result'] == 'success') {
-                alert('찜 해제 완료!')
-                window.location.reload()
-            }
-        }
-    })
 }
 
 function searchList() {
@@ -97,6 +75,12 @@ function search(temp) {
                         make_card(prdList)
                     }
                 }
+            },
+            beforeSend: function() {
+                $("#wrap-loading").show();
+            },
+            complete: function() {
+                $("#wrap-loading").hide();
             }
         })
     }
@@ -123,6 +107,12 @@ function musinsaSearch(temp) {
                         make_card(prdList)
                     }
                 }
+            },
+            beforeSend: function() {
+                $("#wrap-loading").show();
+            },
+            complete: function() {
+                $("#wrap-loading").hide();
             }
         })
     }
@@ -138,7 +128,7 @@ function make_card(prdList) {
                     <h5>${prdList.brdName}</h5>
                     <p style="font-weight:300;">${prdList.prdName}</p>
                 </div>
-                <p class="card-text"> ${prdList.prdPrice} 원</p>
+                <p class="card-text"> ${prdList.prdPrice}</p>
                 <a href="${prdList.prdUrl}" class="btn btn-primary" role="button" target="_blank">구매하기</a> 
                 <a href="#" class="btn btn-default" role="button" onclick="prd_like('${prdList.siteName}','${prdList.prdUrl}')">찜하기</a>
             </div>

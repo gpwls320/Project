@@ -1,23 +1,21 @@
-{% extends "layout.html" %} {% block title %} 검색페이지 {% endblock %} {% block content %}
-<div class="container">
-    <nav>
-        <div class="nav nav-tabs" id="nav-tab" role="tablist">
-            <a class="nav-item nav-link active" id="nav-wconcept-tab" data-toggle="tab" href="#nav-wconcept" role="tab" aria-controls="nav-home" aria-selected="true">W컨셉</a>
-            <a class="nav-item nav-link" id="nav-musinsa-tab" data-toggle="tab" href="#nav-musinsa" role="tab" aria-controls="nav-profile" aria-selected="false">무신사</a>
-        </div>
-    </nav>
-    <div class="tab-content" id="nav-tabContent">
-        <div class="tab-pane fade show active" id="nav-wconcept" role="tabpanel" aria-labelledby="nav-home-tab">
+{% extends "layout.html" %} {% block title %} 어라운드히어 - 상품 목록 {% endblock %} {% block content %}
+
+<div class="wrap">
+    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+        <a class="nav-link active" id="nav-wconcept-tab" data-toggle="pill" href="#nav-wconcept" role="tab" aria-controls="nav-wconcept" aria-selected="true">W concept</a>
+        <a class="nav-link" id="nav-musinsa-tab" data-toggle="pill" href="#nav-musinsa" role="tab" aria-controls="nav-musinsa" aria-selected="false">무신사</a>
+    </div>
+    <div class="tab-content" id="v-pills-tabContent">
+        <div class="tab-pane fade show active" id="nav-wconcept" role="tabpanel" aria-labelledby="v-pills-home-tab">
             <div id="wconcept-wrap">
 
             </div>
         </div>
-        <div class="tab-pane fade" id="nav-musinsa" role="tabpanel" aria-labelledby="nav-profile-tab">
+        <div class="tab-pane fade" id="nav-musinsa" role="tabpanel" aria-labelledby="v-pills-profile-tab">
             <div id="musinsa-wrap">
 
             </div>
         </div>
     </div>
-
 </div>
 {% endblock %}

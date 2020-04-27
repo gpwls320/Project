@@ -7,42 +7,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!--CND BOOTSTRAP -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/home.css') }}">
 
     <!--JQUERY-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="/static/js/search.js"></script>
-
+    <script src="{{ url_for('static', filename='/js/search.js') }}"></script>
 
 </head>
 
 <body>
-    <div id="wrap-loading">
-        <img src="/image/5.gif" alt="Loading..." style="border:0; position:absolute; left:50%; top:50%;" />
-    </div>
-
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="/">쇼핑 큐레이션</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item ">
-                </li>
-            </ul>
-            <form class="form-inline my-2 my-lg-0 " name="searchForm">
-                <input class="form-control mr-sm-2 " type="search " placeholder="Search " aria-label="Search" id="keyword">
-                <button type="button" class="btn btn-outline-success" onclick="searchList()" id="searchBtn">Search</button>
-                <a type="button" class="btn btn-outline-info" href="/mypage">MY PAGE</a>
-            </form>
+    <header>
+        <div class="container">
+            <div id="branding">
+                <a href="/">
+                    <h2>Around <span class="highlight">here</span></h2>
+                </a>
+            </div>
+            <input type="email" placeholder="검색어를 입력하세요." id="keyword">
+            <button type="submit" class="button_1" onclick="searchList()" id="searchBtn">검색</button>
+            <nav>
+                <ul>
+                    <li><a href="https://www.wconcept.co.kr/" target="_blank">W concept</a></li>
+                    <li><a href="https://store.musinsa.com/" target="_blank">무신사</a></li>
+                    <li><a href="/mypage">마이페이지</a></li>
+                </ul>
+            </nav>
         </div>
-    </nav>
-
+    </header>
+    <div id="wrap-loading" style="z-index: 10000; display: none;">
+        <img src=" /static/image/5.gif " alt="Loading... " style="border:0; position:absolute; left:50%; top:50%; " />
+    </div>
     {% block content %} {% endblock %}
 
+    <!-- <footer>
+        <small>&copy; hyeja</small>
+        <nav class="nav ">
+            <ul>
+                <li><a href="/ ">Home</a></li>
+                <li><a href="https://www.wconcept.co.kr/ " target="_blank ">W concept</a></li>
+                <li><a href="schedule.html " target="_blank ">무신사</a></li>
+                <li><a href="/mypate ">마이페이지</a></li>
+            </ul>
+        </nav>
+    </footer> -->
 </body>
 
 </html>
